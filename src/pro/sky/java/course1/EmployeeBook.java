@@ -10,6 +10,16 @@ public class EmployeeBook {
         employeeBook = new Employee[size];
     }
 
+    private static boolean checkDepartmentId(int departmentId) {
+        for (Employee employee : employeeBook) {
+            if (employee != null && employee.getDepartmentId() == departmentId) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static IllegalArgumentException departmentIdException = new IllegalArgumentException("В этом отделе нет сотрудников");
 
     //get Arrays
     private static int[] getSalaryArray() {
@@ -23,6 +33,9 @@ public class EmployeeBook {
     }
 
     private static int[] getSalaryArray(int departmentId) {
+        if(checkDepartmentId(departmentId)) {
+            throw departmentIdException;
+        }
         int[] salaryArray = new int[employeeBook.length];
         for (int i = 0; i < salaryArray.length; i++) {
             if (employeeBook[i] != null && employeeBook[i].getDepartmentId() == departmentId) {
@@ -32,29 +45,40 @@ public class EmployeeBook {
         return Arrays.stream(salaryArray).filter(num -> num > 0).toArray();
     }
 
-    //get Group Values
+    private static String[] getEmployeeBySalary(int salary){
+        String[] str = new String[employeeBook.length];
+        for (int i = 0; i < employeeBook.length; i++) {
+            if(employeeBook[i] != null && employeeBook[i].getSalary() == salary) {
+                str[i] = employeeBook[i].getFullName();
+            }
+        }
+        return str;
+    }
+
+    private static String[] getEmployeeBySalary(int salary, int departmentId){
+        if(checkDepartmentId(departmentId)) {
+            throw departmentIdException;
+        }
+        String[] str = new String[employeeBook.length];
+        for (int i = 0; i < employeeBook.length; i++) {
+            if(employeeBook[i] != null && employeeBook[i].getSalary() == salary && employeeBook[i].getDepartmentId() == departmentId) {
+                str[i] = employeeBook[i].getFullName();
+            }
+        }
+        return str;
+    }
+
+
+    //get, print Group Values
     public int countSumMonthSalary() {
         return Arrays.stream(getSalaryArray()).sum();
     }
 
     public int countSumMonthSalary(int departmentId) {
+        if(checkDepartmentId(departmentId)) {
+            throw departmentIdException;
+        }
         return Arrays.stream(getSalaryArray(departmentId)).sum();
-    }
-
-    public int getMaxSalary() {
-        return Arrays.stream(getSalaryArray()).max().getAsInt();
-    }
-
-    public int getMaxSalary(int departmentId) {
-        return Arrays.stream(getSalaryArray(departmentId)).max().getAsInt();
-    }
-
-    public int getMinSalary() {
-        return Arrays.stream(getSalaryArray()).min().getAsInt();
-    }
-
-    public int getMinSalary(int departmentId) {
-        return Arrays.stream(getSalaryArray(departmentId)).min().getAsInt();
     }
 
     public double getAverageSalary() {
@@ -62,7 +86,64 @@ public class EmployeeBook {
     }   
 
     public double getAverageSalary(int departmentId) {
+        if(checkDepartmentId(departmentId)) {
+            throw departmentIdException;
+        }
         return Arrays.stream(getSalaryArray(departmentId)).average().getAsDouble();
+    }
+
+    public void printMaxSalary() {
+        int maxSalary = Arrays.stream(getSalaryArray()).max().getAsInt();
+        String[] str = getEmployeeBySalary(maxSalary);
+        StringBuilder strInfo = new StringBuilder("Сотрудники с максимальной зп: \n");
+        for (int i = 0; i < str.length; i++) {
+            if(str[i] != null) {
+                strInfo.append(employeeBook[i].getFullName()).append("\n");
+            }
+        }
+        System.out.println(strInfo.toString());
+    }
+
+    public void printMaxSalary(int departmentId) {
+        if(checkDepartmentId(departmentId)) {
+            throw departmentIdException;
+        }
+        int maxSalary = Arrays.stream(getSalaryArray(departmentId)).max().getAsInt();
+        String[] str = getEmployeeBySalary(maxSalary, departmentId);
+        StringBuilder strInfo = new StringBuilder("Сотрудники с максимальной зп в отделе '" + departmentId + "' : \n");
+        for (int i = 0; i < str.length; i++) {
+            if(str[i] != null) {
+                strInfo.append(employeeBook[i].getFullName()).append("\n");
+            }
+        }
+        System.out.println(strInfo.toString());
+    }
+
+    public void printMinSalary() {
+        int minSalary = Arrays.stream(getSalaryArray()).min().getAsInt();
+        String[] str = getEmployeeBySalary(minSalary);
+        StringBuilder strInfo = new StringBuilder("Сотрудники с минимальной зп: \n");
+        for (int i = 0; i < str.length; i++) {
+            if(str[i] != null) {
+                strInfo.append(employeeBook[i].getFullName()).append("\n");
+            }
+        }
+        System.out.println(strInfo.toString());
+    }
+
+    public void printMinSalary(int departmentId) {
+        if(checkDepartmentId(departmentId)) {
+            throw departmentIdException;
+        }
+        int minSalary = Arrays.stream(getSalaryArray(departmentId)).min().getAsInt();
+        String[] str = getEmployeeBySalary(minSalary, departmentId);
+        StringBuilder strInfo = new StringBuilder("Сотрудники с минимальной зп в отделе '" + departmentId + "' : \n");
+        for (int i = 0; i < str.length; i++) {
+            if(str[i] != null) {
+                strInfo.append(employeeBook[i].getFullName()).append("\n");
+            }
+        }
+        System.out.println(strInfo.toString());
     }
 
     
@@ -77,6 +158,9 @@ public class EmployeeBook {
     }
 
     public void indexingSalary(int percent, int departmentId) {
+        if(checkDepartmentId(departmentId)) {
+            throw departmentIdException;
+        }
         for (Employee employee : employeeBook) {
             if (employee != null && employee.getDepartmentId() == departmentId) {
                 int delta = (employee.getSalary() * percent / 100);
@@ -98,10 +182,13 @@ public class EmployeeBook {
     }
 
     public void printEmployees(int departmentId){
+        if(checkDepartmentId(departmentId)) {
+            throw departmentIdException;
+        }
         String[] name = new String[employeeBook.length];
         for (int i = 0; i < employeeBook.length; i++) {
             if (employeeBook[i] != null && employeeBook[i].getDepartmentId() == departmentId ) {
-                name[i] = "fullName: '" + employeeBook[i].getFullName()+ "'";
+                name[i] = "'" + employeeBook[i].getFullName()+ "'";
             }
         }
         System.out.println(Arrays.toString(Arrays.stream(name).filter(num -> num != null).toArray()));
